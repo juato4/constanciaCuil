@@ -50,7 +50,6 @@ public class iniVisual extends JFrame {
 						lblNombre.setText(t.getNombre());
 						lblDni.setText(null);
 						lblDni.setText(textField.getText());
-						lblCuil.setText(null);
 						lblCuil.setText(t.getCuil());
 					}
 				});
