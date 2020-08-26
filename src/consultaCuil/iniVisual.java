@@ -46,9 +46,7 @@ public class iniVisual extends JFrame {
 					public void actionPerformed(ActionEvent e) {
 						
 						t.bucar(textField.getText());
-						lblNombre.setText(null);
 						lblNombre.setText(t.getNombre());
-						lblDni.setText(null);
 						lblDni.setText(textField.getText());
 						lblCuil.setText(t.getCuil());
 					}
