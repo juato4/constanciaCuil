@@ -20,10 +20,7 @@ public class iniVisual extends JFrame {
 	private static JTextField textField;
 	private static JButton btnNewButton;
 	private static JLabel lblNombre,lblDni,lblCuil;
-
-	/**
-	 * Launch the application.
-	 */
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -49,6 +46,10 @@ public class iniVisual extends JFrame {
 						lblNombre.setText(t.getNombre());
 						lblDni.setText(textField.getText());
 						lblCuil.setText(t.getCuil());
+						
+						//t.lasuscr().Subscriber
+							 
+							 
 					}
 				});
 				
@@ -56,9 +57,6 @@ public class iniVisual extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public iniVisual() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 243);
