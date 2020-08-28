@@ -12,11 +12,10 @@ import io.reactivex.functions.Consumer;
 public class asffas {
 
 	public static void main(String[] args) {
-		Flowable.just("Hello world").subscribe(System.out::println);
 		
 		trabajo t = new trabajo();
-		
-		t.lasuscr().subscribe(System.out::println);
+		String result = "";
+		t.lasuscr().dispose();
 		
 		
 	}

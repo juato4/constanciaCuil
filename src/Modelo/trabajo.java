@@ -5,8 +5,15 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 
 public class trabajo {
 	
@@ -22,9 +29,33 @@ public class trabajo {
     	nroLinia=0;
 	}
     
-    public Observable<String> lasuscr() {
+    AtomicInteger counter = new AtomicInteger();
+    Callable<Integer> callable = () -> counter.incrementAndGet();
+
+    
+    public Disposable lasuscr() {
     	
-    	return Observable.
+    	Disposable d = Observable.just("Hello world!")
+    		     .delay(1, TimeUnit.SECONDS)
+    		     .subscribeWith(new DisposableObserver<String>() {
+    		         @Override public void onStart() {
+    		             System.out.println("Start!");
+    		         }
+    		         @Override public void onNext(String t) {
+    		             System.out.println(t);
+    		         }
+    		         @Override public void onError(Throwable t) {
+    		             t.printStackTrace();
+    		         }
+    		         @Override public void onComplete() {
+    		             System.out.println("Done!");
+    		         }
+    		     });
+
+    		 
+    	
+    	//return Single.just("Hello"); 
+    		 return d;
     }
     
     
