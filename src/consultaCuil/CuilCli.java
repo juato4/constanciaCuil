@@ -79,6 +79,10 @@ public class CuilCli {
         appendJsonField(sb, "localidad", persona.getLocalidad());
         sb.append(',');
         appendJsonField(sb, "detalleUrl", persona.getDetalleUrl());
+        sb.append(',');
+        appendJsonField(sb, "detalleNombre", persona.getDetalleNombre());
+        sb.append(',');
+        appendJsonField(sb, "detalleFecha", persona.getDetalleFecha());
         sb.append("}}");
         sb.append('}');
         System.out.println(sb.toString());
@@ -104,6 +108,10 @@ public class CuilCli {
             appendJsonField(sb, "localidad", persona.getLocalidad());
             sb.append(',');
             appendJsonField(sb, "detalleUrl", persona.getDetalleUrl());
+            sb.append(',');
+            appendJsonField(sb, "detalleNombre", persona.getDetalleNombre());
+            sb.append(',');
+            appendJsonField(sb, "detalleFecha", persona.getDetalleFecha());
             sb.append('}');
         }
         sb.append("]}");

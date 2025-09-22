@@ -24,6 +24,8 @@ public class trabajo {
 	private static final Pattern EDAD_PATTERN = Pattern.compile("data-label=\\\"Edad\\\">([^<]*)</td>");
 	private static final Pattern PROVINCIA_PATTERN = Pattern.compile("data-label=\\\"Provincia\\\">([^<]*)</td>");
 	private static final Pattern LOCALIDAD_PATTERN = Pattern.compile("data-label=\\\"Localidad\\\">([^<]*)</td>");
+	private static final Pattern DETALLE_NOMBRE_PATTERN = Pattern.compile("<th>\\s*(?:Apellido y Nombre|Last Name and Name)\\s*</th>\\s*<td>(.*?)</td>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+	private static final Pattern DETALLE_FECHA_PATTERN = Pattern.compile("<th>\\s*(?:Fecha de Nacimiento|Birth Date)\\s*</th>\\s*<td>(.*?)</td>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
 	private String cuil = "";
 	private String nombre = "";
@@ -57,7 +59,12 @@ public class trabajo {
 		String targetUrl = BUSQUEDA_POR_CUIL + dni;
 		try {
 			List<PersonaInfo> resultados = leerPersonas(targetUrl);
-			return resultados.isEmpty() ? null : resultados.get(0);
+			if (resultados.isEmpty()) {
+				return null;
+			}
+			PersonaInfo persona = resultados.get(0);
+			enriquecerPersonaDesdeDetalle(persona);
+			return persona;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
@@ -151,6 +158,97 @@ public class trabajo {
 		String detalleCompleto = detallePath.startsWith("http") ? detallePath : BASE_HOST + detallePath;
 
 		return new PersonaInfo(nombreEncontrado, cuilEncontrado, edadEncontrada, provinciaEncontrada, localidadEncontrada, detalleCompleto);
+	}
+
+	private void enriquecerPersonaDesdeDetalle(PersonaInfo persona) {
+		if (persona == null) {
+			return;
+		}
+		String detalle = persona.getDetalleUrl();
+		if (detalle == null || detalle.isEmpty()) {
+			return;
+		}
+		try (BufferedReader reader = abrirStream(detalle)) {
+			StringBuilder sb = new StringBuilder();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line);
+			}
+			String html = sb.toString();
+			String detalleNombre = extraerDetalleNombre(html);
+			if (detalleNombre != null && !detalleNombre.isEmpty()) {
+				persona.setDetalleNombre(detalleNombre);
+			}
+			String detalleFecha = extraerDetalleFecha(html);
+			if (detalleFecha != null && !detalleFecha.isEmpty()) {
+				persona.setDetalleFecha(detalleFecha);
+			}
+		} catch (IOException e) {
+			// Silenciamos para no frenar la búsqueda si el detalle está restringido o rate-limitado.
+		}
+	}
+
+	private String extraerDetalleNombre(String html) {
+		if (html == null || html.isEmpty()) {
+			return null;
+		}
+		Matcher matcher = DETALLE_NOMBRE_PATTERN.matcher(html);
+		if (!matcher.find()) {
+			return null;
+		}
+		String raw = matcher.group(1);
+		String sinTags = raw.replaceAll("<[^>]+>", " ");
+		String decodificado = decodeHtmlEntities(sinTags);
+		String normalizado = decodificado.replaceAll("\\s+", " ").trim();
+		normalizado = normalizado.replace("Ver Informe Completo", "").replace("View Full Report", "").trim();
+		return normalizado;
+	}
+
+	private String extraerDetalleFecha(String html) {
+		if (html == null || html.isEmpty()) {
+			return null;
+		}
+		Matcher matcher = DETALLE_FECHA_PATTERN.matcher(html);
+		if (!matcher.find()) {
+			return null;
+		}
+		String raw = matcher.group(1);
+		String sinTags = raw.replaceAll("<[^>]+>", " ");
+		String decodificado = decodeHtmlEntities(sinTags);
+		String normalizado = decodificado.replaceAll("\\s+", " ").trim();
+		return normalizado;
+	}
+
+	private String decodeHtmlEntities(String input) {
+		String resultado = input.replace("&nbsp;", " ")
+				.replace("&amp;", "&")
+				.replace("&quot;", "\"")
+				.replace("&apos;", "'")
+				.replace("&#39;", "'");
+		resultado = decodeNumericEntities(resultado, "&#(\\d+);");
+		resultado = decodeNumericEntities(resultado, "&#x([0-9a-fA-F]+);", 16);
+		return resultado;
+	}
+
+	private String decodeNumericEntities(String input, String pattern) {
+		return decodeNumericEntities(input, pattern, 10);
+	}
+
+	private String decodeNumericEntities(String input, String pattern, int radix) {
+		Pattern compiled = Pattern.compile(pattern);
+		Matcher matcher = compiled.matcher(input);
+		StringBuffer buffer = new StringBuffer();
+		while (matcher.find()) {
+			try {
+				int codePoint = Integer.parseInt(matcher.group(1), radix);
+				String replacement = new String(Character.toChars(codePoint));
+				matcher.appendReplacement(buffer, Matcher.quoteReplacement(replacement));
+			} catch (NumberFormatException ex) {
+				matcher.appendReplacement(buffer, matcher.group(0));
+			}
+		}
+		matcher.appendTail(buffer);
+		return buffer.toString();
 	}
 
 	private String encode(String value) {

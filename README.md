@@ -7,14 +7,14 @@ Aplicación Java 8 que consulta los listados públicos de Dateas para obtener in
 - JDK 8 o superior (probado con OpenJDK 17)
 - Conexión a internet para acceder a https://www.dateas.com
 - Maven opcional si querés empaquetar el proyecto; también podés compilar con `javac`
+- Si no tenés Java instalado en macOS, podés usar `brew install openjdk@17` y añadir `/opt/homebrew/opt/openjdk@17/bin` a tu `PATH`
 
 ## Construcción rápida
 
-Compilación sin Maven (colocá los JAR de RxJava en el classpath si necesitás `lasuscr()`):
+Compilación sin Maven:
 
 ```bash
-javac -cp path/a/rxjava.jar:path/a/reactive-streams.jar \
-      -d target/classes $(find src -name '*.java')
+javac -d target/classes $(find src -name '*.java')
 ```
 
 Para ejecutar un ejemplo rápido:
@@ -58,13 +58,28 @@ La clase `Modelo.trabajo` ahora incluye:
 Cada `PersonaInfo` ofrece:
 
 - `getNombre()`, `getCuil()`, `getEdad()`, `getProvincia()`, `getLocalidad()`, `getDetalleUrl()`
+- `getDetalleNombre()` y `getDetalleFecha()`: cuando la página de detalle está disponible, se devuelve el nombre normalizado y la fecha de nacimiento expuesta (por defecto sólo se completa en búsquedas por DNI).
 - `getDni()`: extrae el DNI a partir del CUIL (posición 3 a 10 de los dígitos)
+
+## CLI incluido
+
+Desde `src/consultaCuil/CuilCli.java` podés ejecutar un CLI sencillo para consumir los resultados en formato JSON:
+
+```bash
+javac -d target/classes $(find src -name '*.java')
+java -cp target/classes consultaCuil.CuilCli --dni 27185953144
+
+# o por nombre, con paginación opcional
+java -cp target/classes consultaCuil.CuilCli --name "yataco" --maxPages 3
+```
+
+El CLI emite un objeto JSON con `status` y, según el caso, `persona`, `personas` o `message` para facilitar la integración con otros servicios.
 
 ## Consideraciones
 
 - Dateas puede cambiar el HTML en cualquier momento; si la estructura deja de coincidir, ajustá los patrones regulares en `Modelo.trabajo`.
 - El scraping de Dateas está sujeto a sus términos de servicio; usalo de forma responsable.
-- Para integraciones asíncronas, la demo `lasuscr()` permanece disponible, aunque el flujo de scraping es sincrónico.
+- La información de detalle requiere una segunda solicitud HTTP; si la página está protegida o se aplica rate limiting, esos campos se devolverán en blanco.
 
 ## Integración con otros proyectos
 

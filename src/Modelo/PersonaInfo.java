@@ -8,6 +8,8 @@ public class PersonaInfo {
     private final String provincia;
     private final String localidad;
     private final String detalleUrl;
+    private String detalleNombre;
+    private String detalleFecha;
 
     public PersonaInfo(String nombre, String cuil, String edad, String provincia, String localidad, String detalleUrl) {
         this.nombre = nombre;
@@ -40,6 +42,22 @@ public class PersonaInfo {
 
     public String getDetalleUrl() {
         return detalleUrl;
+    }
+
+    public String getDetalleNombre() {
+        return detalleNombre;
+    }
+
+    public void setDetalleNombre(String detalleNombre) {
+        this.detalleNombre = detalleNombre;
+    }
+
+    public String getDetalleFecha() {
+        return detalleFecha;
+    }
+
+    public void setDetalleFecha(String detalleFecha) {
+        this.detalleFecha = detalleFecha;
     }
 
     public String getDni() {
