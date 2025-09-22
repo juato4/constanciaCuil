@@ -2,6 +2,8 @@
 
 Aplicación Java 8 que consulta los listados públicos de Dateas para obtener información de personas (nombre, CUIL/CUIT, edad, provincia, localidad y URL de detalle). El módulo principal (`Modelo.trabajo`) expone métodos pensados para integrarse con otros proyectos que requieran automatizar búsqueda por DNI o por nombre.
 
+> ¿Buscás más detalles? Consultá la [wiki del proyecto](docs/README.md) para guías paso a paso, referencia de API y notas de resolución de problemas.
+
 ## Requisitos
 
 - JDK 8 o superior (probado con OpenJDK 17)
