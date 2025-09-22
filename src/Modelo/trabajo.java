@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableObserver;
-
 public class trabajo {
 
 	private static final String BASE_HOST = "https://www.dateas.com";
@@ -37,34 +33,6 @@ public class trabajo {
 	private String detalleUrl = "";
 
 	public trabajo() {}
-
-	public Disposable lasuscr() {
-		Disposable d = Observable.just("Hello world!")
-				.delay(1, java.util.concurrent.TimeUnit.SECONDS)
-				.subscribeWith(new DisposableObserver<String>() {
-					@Override
-					public void onStart() {
-						System.out.println("Start!");
-					}
-
-					@Override
-					public void onNext(String t) {
-						System.out.println(t);
-					}
-
-					@Override
-					public void onError(Throwable t) {
-						t.printStackTrace();
-					}
-
-					@Override
-					public void onComplete() {
-						System.out.println("Done!");
-					}
-				});
-
-		return d;
-	}
 
 	public void bucar(String numero) {
 		PersonaInfo info = buscarPorDni(numero);
